@@ -1,7 +1,33 @@
 require "aasm"
 
+class Class 
+
+    def lock_state(lock_name)
+
+      aasm "#{lock_name}_lock".to_sym, namespace: "#{lock_name}".to_sym do
+        state :unlocked, initial: true
+        state :locked
+
+        event "lock_#{lock_name}".to_sym do
+          transitions to: :locked
+        end
+
+        event "unlock_#{lock_name}".to_sym do
+          transitions to: :unlocked
+        end
+    
+      end
+    
+    end
+
+end
+
+
 class Door
   include AASM
+
+  lock_state :deadbolt
+  lock_state :knob
 
   aasm do
     state :closed, initial: true
@@ -16,29 +42,4 @@ class Door
     end
   end
 
-  aasm :deadbolt_lock, namespace: :deadbolt do
-    state :unlocked, initial: true
-    state :locked
-
-    event :lock_deadbolt do
-      transitions to: :locked
-    end
-
-    event :unlock_deadbolt do
-      transitions to: :unlocked
-    end
-  end
-
-  aasm :knob_lock, namespace: :knob do
-    state :unlocked, initial: true
-    state :locked
-
-    event :lock_knob do
-      transitions to: :locked
-    end
-
-    event :unlock_knob do
-      transitions to: :unlocked
-    end
-  end
 end
